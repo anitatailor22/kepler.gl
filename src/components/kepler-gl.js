@@ -198,6 +198,7 @@ function KeplerGlFactory(
         layerBlending,
         layerClasses,
         interactionConfig,
+        tiledDatasets,
         datasets,
         layerData,
         hoverInfo,
@@ -225,10 +226,12 @@ function KeplerGlFactory(
 
       const mapFields = {
         datasets,
+        tiledDatasets,
         mapboxApiAccessToken,
         mapState,
         mapStyle,
         mapControls: uiState.mapControls,
+        filters,
         layers,
         layerOrder,
         layerData,

@@ -206,6 +206,7 @@ class HeatmapLayer extends MapboxGLLayer {
   );
 
   formatLayerData(_, allData, filteredIndex, oldLayerData, opt = {}) {
+    super.formatLayerData(_, allData, filteredIndex, oldLayerData);
     const options = {
       allData,
       filteredIndex,

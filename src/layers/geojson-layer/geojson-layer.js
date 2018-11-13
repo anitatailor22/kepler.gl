@@ -163,6 +163,7 @@ export default class GeoJsonLayer extends Layer {
   }
 
   formatLayerData(_, allData, filteredIndex, oldLayerData, opt = {}) {
+    super.formatLayerData(_, allData, filteredIndex, oldLayerData);
     const {
       colorScale,
       colorField,
@@ -326,6 +327,7 @@ export default class GeoJsonLayer extends Layer {
   }
 
   renderLayer({
+    id,
     data,
     idx,
     objectHovered,
@@ -378,7 +380,7 @@ export default class GeoJsonLayer extends Layer {
     return [
       new DeckGLGeoJsonLayer({
         ...layerProps,
-        id: this.id,
+        id: id || this.id,
         idx,
         data: data.data,
         getFillColor: data.getFillColor,

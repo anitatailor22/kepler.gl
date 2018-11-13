@@ -86,10 +86,13 @@ export default class Layer {
     // visConfigSettings
     this.visConfigSettings = {};
 
+
     this.config = this.getDefaultLayerConfig({
       columns: this.getLayerColumns(),
       ...props
     });
+
+    this.version = 0;
   }
 
   get layerIcon() {
@@ -392,7 +395,10 @@ export default class Layer {
     return Math.pow(2, Math.max(8 - zoom + zoomOffset, 0));
   }
 
-  formatLayerData(data, allData, filteredIndex) {
+  formatLayerData(data, allData, filteredIndex, oldLayerData) {
+    if (oldLayerData) {
+      this.version++;
+    }
     return {};
   }
 

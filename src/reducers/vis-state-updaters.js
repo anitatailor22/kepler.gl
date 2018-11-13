@@ -83,6 +83,7 @@ export const INITIAL_VIS_STATE = {
   // a collection of multiple dataset
   datasets: {},
   editingDataset: undefined,
+  tiledDatasets: [],
 
   interactionConfig: getDefaultInteraction(),
   interactionToBeMerged: undefined,
@@ -1075,5 +1076,29 @@ export function updateAllLayerDomainData(state, dataId, newFilter) {
     ...state,
     layers: newLayers,
     layerData: newLayerDatas
+  };
+}
+
+export function addTiledDatasetSampleUpdater(state, action) {
+  const {dataset} = action;
+  const visState = updateVisDataUpdater(state, {
+    datasets: {
+      info: {
+        ...dataset.info,
+        isTiled: true
+      },
+      data: dataset.data
+    }
+  });
+  return visState;
+};
+
+export function addTiledDataIdUpdater(state, action) {
+  const {dataId} = action;
+  const {tiledDatasets} = state;
+  tiledDatasets.push(dataId);
+  return {
+    ...state,
+    tiledDatasets
   };
 }

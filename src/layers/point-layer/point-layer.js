@@ -139,6 +139,7 @@ export default class PointLayer extends Layer {
   }
 
   formatLayerData(_, allData, filteredIndex, oldLayerData, opt = {}) {
+    super.formatLayerData(_, allData, filteredIndex, oldLayerData);
     const {
       colorScale,
       colorDomain,

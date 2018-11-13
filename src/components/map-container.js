@@ -40,6 +40,7 @@ import {transformRequest} from 'utils/map-style-utils/mapbox-utils';
 
 // default-settings
 import {LAYER_BLENDINGS} from 'constants/default-settings';
+import SharedstreetsLayer from 'deckgl-layers/sharedstreets-layer/sharedstreets-layer';
 
 const MAP_STYLE = {
   container: {
@@ -320,9 +321,12 @@ export default function MapContainerFactory(MapPopover, MapControl) {
 
     _renderOverlay() {
       const {
+        datasets,
         mapState,
+        layers,
         layerData,
         layerOrder,
+        tiledDatasets,
         visStateActions
       } = this.props;
 
@@ -337,17 +341,70 @@ export default function MapContainerFactory(MapPopover, MapControl) {
           .reduce(this._renderLayer, []);
       }
 
+      // all tiled datasets maps to its sample layers
+      const tiledDataToLayers = new Map();
+
+      Object.keys(datasets).filter(dataId => datasets[dataId].isTiled)
+        .forEach(tiledDataset => tiledDataToLayers.set(tiledDataset, {
+          keplerGlLayers: [],
+          deckGlLayers: []
+        }));
+
+      const layersWithTiledData = new Set();
+
+      layers.forEach(layer => {
+        const dataId = layer.config.dataId;
+        const isTiledDataset = datasets[dataId].isTiled;
+        if (isTiledDataset) {
+          // find its corresponding deckgl layer
+          const sampleDataLayer = deckGlLayers.find(deckGLLayer => deckGLLayer.id === layer.id);
+          layersWithTiledData.add(sampleDataLayer);
+          tiledDataToLayers.get(dataId).deckGlLayers.push(sampleDataLayer);
+          tiledDataToLayers.get(dataId).keplerGlLayers.push(layer);
+        }
+      });
+
+      const layersToRender = deckGlLayers.filter(layer => !layersWithTiledData.has(layer));
+      if (tiledDatasets.includes('sharedstreets')) {
+        const sharedstreetsLayer = this._renderSharedstreetsLayer();
+        layersToRender.push(sharedstreetsLayer);
+      }
+
       return (
         <DeckGL
           viewState={mapState}
           id="default-deckgl-overlay"
-          layers={deckGlLayers}
+          layers={layersToRender}
           onWebGLInitialized={this._onWebGLInitialized}
           onBeforeRender={this._onBeforeRender}
           onLayerHover={visStateActions.onLayerHover}
           onLayerClick={visStateActions.onLayerClick}
         />
       );
+    }
+
+    _renderSharedstreetsLayer() {
+      const {
+        visStateActions,
+        mapState,
+        interactionConfig,
+        clicked,
+        hoverInfo,
+        layers,
+        filters
+      } = this.props;
+
+      const objectHovered = clicked || hoverInfo;
+
+      return new SharedstreetsLayer({
+        id: 'sharedstreet',
+        addTiledDatasetSample: visStateActions.addTiledDatasetSample,
+        layers,
+        filters,
+        objectHovered,
+        mapState,
+        interactionConfig
+      })
     }
 
     _renderMapboxLayers() {
